@@ -57,4 +57,6 @@ export interface IProductListingResponse {
     products: IProduct[];
 }
 
+export type TCartItem = IProduct & { quantity: number };
+
 export interface IProductListingQueryArgs { limit?: number; skip?: number; sortBy?: keyof IProduct, order?: "asc" | "desc"; search?: string; category?: IProductCategory["slug"] }

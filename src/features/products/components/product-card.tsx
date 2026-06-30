@@ -7,8 +7,10 @@ import {
   CardHeader,
 } from "@/components/ui";
 import type { IProduct } from "../types";
-import { Eye, ShoppingCart, Star } from "lucide-react";
+import { Eye, ShoppingCart, Star, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useProductFilter } from "@/contexts/product/useProductFilters";
+import { getDiscountedPrice } from "../utils";
 
 interface IProductCardProps {
   product: IProduct;
@@ -16,12 +18,12 @@ interface IProductCardProps {
 }
 
 export function ProductCard({
-  product,
-  onAddToCart,
+  product
 }: IProductCardProps) {
+  const { cartItems, handleAddToCart, handleRemoveFromCart } = useProductFilter();
   const navigate = useNavigate();
-  const discountedPrice =
-    product.price - (product.price * product.discountPercentage) / 100;
+  const discountedPrice = getDiscountedPrice(product);
+  const hasInCart = cartItems.findIndex((item) => item.id === product.id) !== -1;
 
   return (
     <Card className="group overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-xl">
@@ -90,14 +92,21 @@ export function ProductCard({
           className="w-full"
           onClick={() => navigate(`/products/${product.id}`)}
         >
-          <Eye className="mr-2 size-4" />
+          <Eye className="size-4" />
           Details
         </Button>
 
-        <Button className="w-full" onClick={() => onAddToCart?.(product)}>
-          <ShoppingCart className="mr-2 size-4" />
-          Add
-        </Button>
+        {hasInCart ? (
+          <Button variant={"destructive"} className="w-full" onClick={() => handleRemoveFromCart(product.id)}>
+            <Trash2 className="-4" />
+            Remove from Cart
+          </Button>
+        ) : (
+          <Button className="w-full" onClick={() => handleAddToCart({ ...product, quantity: 1 })}>
+            <ShoppingCart className="-4" />
+            Add
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

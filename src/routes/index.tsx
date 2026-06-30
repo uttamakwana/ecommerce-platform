@@ -1,5 +1,5 @@
 import { RootLayout } from "@/layout";
-import { Home, NoPageFound, Product } from "@/pages";
+import { Cart, Home, NoPageFound, Product } from "@/pages";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -10,6 +10,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
       },
       {
         path: "/products/:id",

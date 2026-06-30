@@ -1,9 +1,14 @@
-import type { IProductCategory } from "@/features/products/types";
+import type { IProductCategory, TCartItem } from "@/features/products/types";
 import { createContext, use } from "react";
 import type { THandleSearchParamChangeKey } from "./type";
 
 export type TCategoryContextValue = IProductCategory["slug"] | undefined;
 type IProductContext = {
+  getCartItem: (productId: TCartItem["id"]) => TCartItem | undefined;
+  cartItems: TCartItem[];
+  handleAddToCart: (item: TCartItem) => void;
+  handleRemoveFromCart: (itemId: TCartItem["id"]) => void;
+  handleChangeQuantity: (itemId: TCartItem["id"], newQuantity: number) => void;
   searchParams: URLSearchParams;
   handleChangeSearchParams: (
     updates: Partial<THandleSearchParamChangeKey>,
