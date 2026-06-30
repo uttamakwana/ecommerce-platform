@@ -50,4 +50,11 @@ export interface IProductCategory {
     url: string;
 }
 
-export interface IProductListingQueryArgs { limit?: number; skip?: number; sortBy: keyof IProduct, order: "asc" | "desc" }
+export interface IProductListingResponse {
+    total: number;
+    limit: number;
+    skip: number;
+    products: IProduct[];
+}
+
+export interface IProductListingQueryArgs { limit?: number; skip?: number; sortBy?: keyof IProduct, order?: "asc" | "desc"; search?: string; category?: IProductCategory["slug"] }
