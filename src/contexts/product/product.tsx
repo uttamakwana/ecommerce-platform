@@ -1,4 +1,4 @@
-import { useCallback, useState, type PropsWithChildren } from "react";
+import { useCallback, type PropsWithChildren } from "react";
 import {
   ProductContext
 } from "./useProductFilters";
@@ -6,13 +6,14 @@ import { useSearchParams } from "react-router";
 import type { THandleSearchParamChangeKey } from "./type";
 import type { TCartItem } from "@/features/products/types";
 import { toast } from "sonner";
+import { useLocalStorage } from "@/hooks";
 
 type TProductContextProvider = PropsWithChildren;
 export const ProductContextProvider = ({
   children,
 }: TProductContextProvider) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [cartItems, setCartItems] = useState<TCartItem[]>([]);
+  const [cartItems, setCartItems] = useLocalStorage<TCartItem[]>("cart-items", []);
   const getCartItem = (productId: TCartItem["id"]) => cartItems.find((item) => item.id === productId);
 
   const handleAddToCart = useCallback((item: TCartItem) => {
