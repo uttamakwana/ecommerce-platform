@@ -60,6 +60,10 @@ export function ProductListing() {
             />
           );
         })}
+
+        {isFetchingNextPage && Array.from({ length: 20 }).map((_, index) => (
+          <ProductCardSkeleton key={index} />
+        ))}
       </div>
     </div>
   );

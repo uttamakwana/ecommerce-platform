@@ -1,5 +1,6 @@
 import { Badge, Button } from "@/components/ui";
 import { ProductBreadcrumb, ProductDetailsSkeleton } from "@/features/products/components";
+import { ProductNotFound } from "@/features/products/components/product-no-found";
 import { useGetProduct } from "@/features/products/hooks";
 import { ShoppingCart, Star } from "lucide-react";
 import { useParams } from "react-router";
@@ -7,10 +8,20 @@ import { useParams } from "react-router";
 
 export function Product() {
   const { id } = useParams<{ id: string; }>();
-  const { data: product, isLoading } = useGetProduct(id);
+  const productId = Number(id);
+
+  const isValidId = Number.isInteger(productId) && productId > 0;
+
+  const { data: product, isLoading } = useGetProduct(productId, { enabled: isValidId });
 
   if (isLoading) {
     return <ProductDetailsSkeleton />
+  }
+
+  if (!product) {
+    return <div className="p-4 pt-0">
+      <ProductNotFound />
+    </div>
   }
 
   const discountedPrice =

@@ -10,11 +10,12 @@ export function useCategories() {
   });
 }
 
-export function useGetProduct(id: string) {
+export function useGetProduct(id: number, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: PRODUCT_QUERY_KEYS.PRODUCT(id),
     queryFn: () => productsApi.getProduct(id),
     staleTime: 10 * 60_000,
+    enabled: options?.enabled ?? true,
   });
 }
 

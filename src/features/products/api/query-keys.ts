@@ -1,5 +1,7 @@
+import type { IProduct } from "../types";
+
 export const PRODUCT_QUERY_KEYS = {
   CATEGORIES: ["categories"],
   PRODUCTS: (filters = {}) => ["products", filters],
-  PRODUCT: (id: string) => ["product", id]
+  PRODUCT: (id: IProduct["id"]) => ["product", id]
 };

@@ -14,7 +14,7 @@ export const productsApi = {
     order,
   }: IProductListingQueryArgs = {}) =>
     get<IProductListingResponse>("/products", { limit, skip, sortBy, order }),
-  getProduct: (id: string) => get<IProduct>(`/products/${id}`),
+  getProduct: (id: IProduct["id"]) => get<IProduct>(`/products/${id}`),
   searchProducts: (query: string, {
     limit,
     skip,
