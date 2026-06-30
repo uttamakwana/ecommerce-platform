@@ -49,3 +49,5 @@ export interface IProductCategory {
     name: string;
     url: string;
 }
+
+export interface IProductListingQueryArgs { limit?: number; skip?: number; sortBy: keyof IProduct, order: "asc" | "desc" }
