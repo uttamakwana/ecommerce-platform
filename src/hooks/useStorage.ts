@@ -37,10 +37,10 @@ export function useStorage<T>(
 
     // Track the latest value so the cross-tab listener can avoid redundant writes.
     const valueRef = useRef<T>(value);
-    valueRef.current = value;
-
+    
     // Persist to storage whenever the value or key changes.
     useEffect(() => {
+        valueRef.current = value;
         const storage = type === "local" ? window.localStorage : window.sessionStorage;
         if (!storage) return;
 

@@ -4,14 +4,14 @@ import { ProductNotFound } from "@/features/products/components/product-no-found
 import { CartSummary } from "./cart-summary";
 import { getDiscountedPrice } from "@/features/products/utils";
 
-export function Cart() {
+export default function Cart() {
     const { cartItems, handleRemoveFromCart, handleChangeQuantity } = useProductFilter();
     const hasCartItems = cartItems.length > 0;
     const { subTotal, discount, shipping, tax } = cartItems.reduce((acc, item) => {
         const discountedPrice = getDiscountedPrice(item);
-        acc.subTotal += discountedPrice * item.quantity;
+        acc.subTotal += item.price * item.quantity;
         acc.discount += (item.price * item.discountPercentage / 100) * item.quantity;
-        acc.shipping += 10 * item.quantity; // Assuming a flat shipping rate of $10 per item
+        acc.shipping += 5 * item.quantity; // Assuming a flat shipping rate of $5 per item
         acc.tax += (discountedPrice * 0.1) * item.quantity; // Assuming a flat tax rate of 10%
         return acc;
     }, { subTotal: 0, discount: 0, shipping: 0, tax: 0 });

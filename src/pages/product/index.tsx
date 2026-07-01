@@ -9,7 +9,7 @@ import { CartItemQuantity } from "../cart/cart-item-quantity";
 import { getDiscountedPrice } from "@/features/products/utils";
 
 
-export function Product() {
+export default function Product() {
   const { id } = useParams<{ id: string; }>();
   const productId = Number(id);
 
@@ -86,7 +86,7 @@ export function Product() {
             </Badge>
 
             {hasInCart ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <CartItemQuantity quantity={cartItem.quantity} onIncrease={() => handleChangeQuantity(product.id, cartItem.quantity + 1)} onDecrease={() => handleChangeQuantity(product.id, cartItem.quantity - 1)} />
 
                 <Button size="lg" variant="destructive" onClick={() => handleRemoveFromCart(product.id)}>

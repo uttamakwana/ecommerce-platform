@@ -9,11 +9,17 @@ export function SearchProduct() {
   const isHomePage = pathname === "/";
 
   return (
-    <div className="flex items-center gap-2">
-      {isHomePage && <><CategoryDropdown />
-        <SearchInput /></>}
-      <ModeToggle />
-      <Cart />
+    <div className="flex items-center flex-wrap gap-2">
+      {isHomePage && (
+        <>
+          <CategoryDropdown />
+          <SearchInput />
+        </>
+      )}
+      <div className="flex items-center gap-2 mt-4 sm:mt-0 justify-end grow sm:grow-0">
+        <ModeToggle />
+        <Cart />
+      </div>
     </div>
   );
 }

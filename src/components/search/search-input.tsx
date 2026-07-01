@@ -9,14 +9,13 @@ export function SearchInput() {
 
   const [inputValue, setInputValue] = useState("");
   const debouncedInputValue = useDebouncedValue(inputValue);
-  console.log({ inputValue, debouncedInputValue });
 
   useEffect(() => {
     handleChangeSearchParams({ search: debouncedInputValue });
-  }, [debouncedInputValue]);
+  }, [handleChangeSearchParams, debouncedInputValue]);
 
   return (
-    <InputGroup className="grow w-full sm:max-w-xl">
+    <InputGroup className="grow sm:grow-0 w-full sm:w-auto sm:max-w-xl">
       <InputGroupInput
         value={inputValue}
         placeholder="Search a product..."

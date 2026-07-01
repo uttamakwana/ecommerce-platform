@@ -1,6 +1,7 @@
 import { RootLayout } from "@/layout";
-import { Cart, Home, NoPageFound, Product } from "@/pages";
 import { createBrowserRouter } from "react-router";
+import { Cart, Home, NoPageFound, Product } from "./routes";
+import { withSuspense } from "./withSuspense";
 
 export const router = createBrowserRouter([
   {
@@ -9,20 +10,20 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: withSuspense(<Home />),
       },
       {
         path: "cart",
-        element: <Cart />,
+        element: withSuspense(<Cart />),
       },
       {
         path: "/products/:id",
-        element: <Product />,
+        element: withSuspense(<Product />),
       },
     ],
   },
   {
     path: "*",
-    element: <NoPageFound />,
+    element: withSuspense(<NoPageFound />),
   },
 ]);

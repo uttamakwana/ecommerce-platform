@@ -18,7 +18,7 @@ export function CategoryDropdown() {
     <Select onValueChange={(value: IProductCategory["slug"]) => {
       handleChangeSearchParams({ category: value === "All" ? undefined : value });
     }}>
-      <SelectTrigger className="w-max">
+      <SelectTrigger className="w-full sm:w-max">
         <SelectValue placeholder="Select a category" />
       </SelectTrigger>
       <SelectContent>

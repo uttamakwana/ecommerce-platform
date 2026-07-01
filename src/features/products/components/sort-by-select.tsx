@@ -11,30 +11,14 @@ import {
 import type { IProduct } from "../types";
 import { useProductFilter } from "@/contexts/product/useProductFilters";
 import { FunnelX, ListSortAscending, ListSortDescending } from "lucide-react";
+import { toReadableString } from "@/lib";
 
 const SORT_BY_OPTIONS: Array<keyof IProduct> = [
-  "id",
   "title",
-  "description",
-  "category",
   "price",
-  "discountPercentage",
   "rating",
+  "discountPercentage",
   "stock",
-  "tags",
-  "brand",
-  "sku",
-  "weight",
-  "dimensions",
-  "warrantyInformation",
-  "shippingInformation",
-  "availabilityStatus",
-  "reviews",
-  "returnPolicy",
-  "minimumOrderQuantity",
-  "meta",
-  "images",
-  "thumbnail",
 ];
 
 export function SortBySelect() {
@@ -49,8 +33,11 @@ export function SortBySelect() {
   return (
     <div className="flex items-center gap-2">
       <Select
+        value={sortBy ?? ""}
         onValueChange={(value: keyof IProduct) => {
-          handleChangeSearchParams({ sortBy: value });
+          handleChangeSearchParams({
+            sortBy: value,
+          });
         }}
       >
         <SelectTrigger className="w-max">
@@ -59,10 +46,10 @@ export function SortBySelect() {
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Sort By</SelectLabel>
-            <SelectItem value="All">All</SelectItem>
+            {/* <SelectItem value="All">All</SelectItem> */}
             {SORT_BY_OPTIONS?.map((sortByOption) => (
               <SelectItem key={sortByOption} value={sortByOption}>
-                {sortByOption}
+                {toReadableString(sortByOption)}
               </SelectItem>
             ))}
           </SelectGroup>
@@ -73,11 +60,15 @@ export function SortBySelect() {
         <Button
           onClick={() => {
             handleChangeSearchParams({
-              order: order === "asc" ? "desc" : "asc",
+              order: !order ? "desc" : order === "asc" ? "desc" : "asc",
             });
           }}
         >
-          {order === "asc" ? <ListSortDescending /> : <ListSortAscending />}
+          {!order || order === "asc" ? (
+            <ListSortAscending />
+          ) : (
+            <ListSortDescending />
+          )}
         </Button>
       )}
 

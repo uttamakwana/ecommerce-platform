@@ -13,6 +13,7 @@ type IProductContext = {
   handleChangeSearchParams: (
     updates: Partial<THandleSearchParamChangeKey>,
   ) => void;
+  emptyCart: () => void;
 };
 export const ProductContext = createContext<IProductContext | null>(null);
 

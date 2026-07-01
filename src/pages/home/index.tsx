@@ -1,6 +1,6 @@
 import { ProductListing } from "./product-listing";
 
-export function Home() {
+export default function Home() {
   return (
     <div>
       <ProductListing />

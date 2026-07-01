@@ -8,3 +8,6 @@ export * from "./skeleton";
 export * from "./breadcrumb";
 export * from "./sonner";
 export * from "./dropdown-menu";
+export * from "./alert";
+export * from "./alert-dialog";
+export * from "./confetti"

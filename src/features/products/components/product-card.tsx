@@ -7,7 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui";
 import type { IProduct } from "../types";
-import { Eye, ShoppingCart, Star, Trash2 } from "lucide-react";
+import { Eye, ShoppingCart, Star } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useProductFilter } from "@/contexts/product/useProductFilters";
 import { getDiscountedPrice } from "../utils";
@@ -31,7 +31,7 @@ export function ProductCard({
         <img
           src={product.thumbnail}
           alt={product.title}
-          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-101 cursor-pointer"
           onClick={() => navigate(`/products/${product.id}`)}
         />
 
@@ -98,12 +98,12 @@ export function ProductCard({
 
         {hasInCart ? (
           <Button variant={"destructive"} className="w-full" onClick={() => handleRemoveFromCart(product.id)}>
-            <Trash2 className="-4" />
-            Remove from Cart
+            <ShoppingCart className="size-4" />
+            Remove
           </Button>
         ) : (
           <Button className="w-full" onClick={() => handleAddToCart({ ...product, quantity: 1 })}>
-            <ShoppingCart className="-4" />
+            <ShoppingCart className="size-4" />
             Add
           </Button>
         )}

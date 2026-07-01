@@ -2,7 +2,7 @@ import { Button } from "@/components/ui";
 import { Home, TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router";
 
-export function NoPageFound() {
+export default function NoPageFound() {
   const navigate = useNavigate();
 
   return (
