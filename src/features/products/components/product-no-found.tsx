@@ -11,7 +11,7 @@ type TProductNotFoundProps = {
 export function ProductNotFound({
     title = "No products found",
     description = "We couldn't find any products matching your current search or filters.",
-    actionLabel = "Go to products",
+    actionLabel,
 }: TProductNotFoundProps) {
     const navigate = useNavigate();
 
@@ -27,9 +27,9 @@ export function ProductNotFound({
                 {description}
             </p>
 
-            <Button className="mt-6" onClick={() => navigate(`/`)}>
+            {actionLabel && <Button className="mt-6" onClick={() => navigate(`/`)}>
                 {actionLabel}
-            </Button>
+            </Button>}
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { Link } from "react-router";
 
 export function Header() {
   return (
-    <div className="flex items-center justify-between gap-4 p-4 border-b border-gray-200">
+    <div className="flex items-center justify-between flex-wrap gap-4 p-4 px-6 border border-b">
       <Link to="/">
         <h1 className="font-bold text-xl flex items-center gap-2">
           <ShoppingCart />

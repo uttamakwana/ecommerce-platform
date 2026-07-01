@@ -9,7 +9,7 @@ export function CategoryPills() {
   const category = searchParams.get("category") || undefined;
 
   return (
-    <div className="flex overflow-x-auto gap-2 px-4 scrollbar-none py-2">
+    <div className="flex overflow-x-auto gap-2 px-4 scrollbar-none py-2 pl-0">
       <Button
         variant={!category ? "default" : "outline"}
         onClick={() => handleChangeSearchParams({ category: undefined })}

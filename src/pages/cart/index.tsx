@@ -19,7 +19,7 @@ export function Cart() {
     return <div className="flex flex-col gap-4 pb-4">
         {!hasCartItems && <ProductNotFound title="Cart is empty" description="Kindly look into our products" actionLabel="Go to Products" />}
 
-        <div className="flex flex-col sm:flex-row">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 pr-0 sm:pr-4">
             <div className="flex flex-col gap-4 px-4 flex-1">
                 {cartItems.map((item) => <CartItem key={item.id} product={item} quantity={item.quantity} onRemove={handleRemoveFromCart} onIncrease={() => handleChangeQuantity(item.id, item.quantity + 1)} onDecrease={() => handleChangeQuantity(item.id, item.quantity - 1)} />)}
             </div>

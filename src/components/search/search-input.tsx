@@ -16,7 +16,7 @@ export function SearchInput() {
   }, [debouncedInputValue]);
 
   return (
-    <InputGroup className="max-w-xl">
+    <InputGroup className="grow w-full sm:max-w-xl">
       <InputGroupInput
         value={inputValue}
         placeholder="Search a product..."

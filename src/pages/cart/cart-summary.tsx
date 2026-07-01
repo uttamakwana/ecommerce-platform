@@ -18,7 +18,7 @@ export function CartSummary({
     const total = subTotal - discount + shipping + tax;
 
     return (
-        <Card className="sticky flex-1 max-w-60 self-start">
+        <Card className="sticky flex-1 max-w-full sm:max-w-60 mx-4 sm:mx-0 self-stretch sm:self-start">
             <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
             </CardHeader>

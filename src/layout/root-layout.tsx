@@ -5,7 +5,7 @@ import { ProductContextProvider } from "@/contexts/product/product";
 
 export function RootLayout() {
   return (
-    <div className="bg-stone-50 min-h-screen h-screen p-2">
+    <div className="bg-stone-50 dark:bg-stone-900 min-h-screen h-screen p-2">
       <ProductContextProvider>
         <Container>
           {/* Header */}
