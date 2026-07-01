@@ -1,15 +1,28 @@
 import { ShoppingCart } from "lucide-react";
-import { Badge, Button } from "../ui";
 import { Link } from "react-router";
-import { useProductFilter } from "@/contexts/product/useProductFilters";
+import { Badge, Button } from "../ui";
+import { useCart } from "@/contexts";
 
-export function Cart() {
-    const { cartItems } = useProductFilter();
-    const totalItems = cartItems.length;
-    const hasTotalItems = totalItems > 0;
+export function CartButton() {
+  const { totalItems } = useCart();
+  const hasItems = totalItems > 0;
 
-    return <div className="relative"><Link to="/cart">
-        {hasTotalItems && <Badge className="absolute -top-2 -right-2 text-xs">{totalItems}</Badge>}
-        <Button variant="outline"><ShoppingCart /></Button></Link>
-    </div>
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      size="icon"
+      className="relative"
+      aria-label={`Cart, ${totalItems} item${totalItems === 1 ? "" : "s"}`}
+    >
+      <Link to="/cart">
+        <ShoppingCart className="size-5" />
+        {hasItems && (
+          <Badge className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full p-0 text-[11px] tabular-nums">
+            {totalItems > 99 ? "99+" : totalItems}
+          </Badge>
+        )}
+      </Link>
+    </Button>
+  );
 }

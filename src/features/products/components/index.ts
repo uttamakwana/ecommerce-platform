@@ -3,3 +3,8 @@ export * from "./sort-by-select";
 export * from "./product-card-skeleton";
 export * from "./product-details-skeleton";
 export * from "./product-breadcrumb";
+export * from "./virtualized-product-grid";
+export * from "./image-gallery";
+export * from "./product-reviews";
+export * from "./star-rating";
+export * from "./compare-bar";

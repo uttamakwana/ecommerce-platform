@@ -1,19 +1,20 @@
 import { Outlet } from "react-router";
 import { Header } from "./header";
-import { Container } from "@/components/container";
-import { ProductContextProvider } from "@/contexts/product/product";
+import { StoreProvider } from "@/contexts";
+import { CompareBar } from "@/features/products/components/compare-bar";
+import { ScrollToTop } from "./scroll-to-top";
 
 export function RootLayout() {
   return (
-    <div className="bg-stone-50 dark:bg-stone-900 min-h-screen h-screen p-2">
-      <ProductContextProvider>
-        <Container>
-          {/* Header */}
-          <Header />
-          {/* Outlet */}
+    <StoreProvider>
+      <ScrollToTop />
+      <div className="flex min-h-screen flex-col bg-background">
+        <Header />
+        <main className="mx-auto w-full max-w-[1600px] flex-1">
           <Outlet />
-        </Container>
-      </ProductContextProvider>
-    </div>
+        </main>
+        <CompareBar />
+      </div>
+    </StoreProvider>
   );
 }

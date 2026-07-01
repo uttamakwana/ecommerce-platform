@@ -1,37 +1,52 @@
 import { useCategories } from "@/features/products/hooks";
-import { Button } from "../ui";
-import { useProductFilter } from "@/contexts/product/useProductFilters";
+import { useFilters } from "@/hooks";
+import { cn } from "@/lib";
 import { CategoryPillsSkeleton } from "./category-pills-skeleton";
 
 export function CategoryPills() {
   const { data: categories, isLoading } = useCategories();
-  const { searchParams, handleChangeSearchParams } = useProductFilter();
-  const category = searchParams.get("category") || undefined;
+  const { category, setFilters } = useFilters();
+
+  const pill = (active: boolean) =>
+    cn(
+      "shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+      active
+        ? "border-transparent bg-primary text-primary-foreground shadow-sm"
+        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+    );
 
   return (
-    <div className="flex overflow-x-auto gap-2 px-4 scrollbar-none py-2 pl-0">
-      <Button
-        variant={!category ? "default" : "outline"}
-        onClick={() => handleChangeSearchParams({ category: undefined })}
+    <div
+      className="scrollbar-none flex gap-2 overflow-x-auto pb-1"
+      role="tablist"
+      aria-label="Product categories"
+    >
+      <button
+        role="tab"
+        aria-selected={!category}
+        className={pill(!category)}
+        onClick={() => setFilters({ category: undefined })}
       >
         All
-      </Button>
+      </button>
 
-      {isLoading && Array.from({ length: 30 }).map((_, index) => <CategoryPillsSkeleton key={index} />)}
+      {isLoading &&
+        Array.from({ length: 12 }).map((_, index) => (
+          <CategoryPillsSkeleton key={index} />
+        ))}
 
-      {categories?.slice().map((cat) => {
+      {categories?.map((cat) => {
         const isActive = category === cat.slug;
-
         return (
-          <Button
-            variant={isActive ? "default" : "outline"}
+          <button
             key={cat.slug}
-            onClick={() => {
-              handleChangeSearchParams({ category: cat.slug });
-            }}
+            role="tab"
+            aria-selected={isActive}
+            className={pill(isActive)}
+            onClick={() => setFilters({ category: cat.slug })}
           >
             {cat.name}
-          </Button>
+          </button>
         );
       })}
     </div>

@@ -1,26 +1,47 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui";
 import { Link } from "react-router";
+import { toReadableString } from "@/lib";
 
 type TProductBreadcrumbProps = {
-    title: string;
-}
-export function ProductBreadcrumb({ title }: TProductBreadcrumbProps) {
-    return <Breadcrumb>
-        <BreadcrumbList>
+  title: string;
+  category?: string;
+};
+
+export function ProductBreadcrumb({ title, category }: TProductBreadcrumbProps) {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link to="/">Home</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        {category && (
+          <>
             <BreadcrumbItem>
-                <Link to="/">
-                    <BreadcrumbLink>Home</BreadcrumbLink></Link>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-                <Link to="/">
-                    <BreadcrumbLink>Products</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link to={`/?category=${category}`}>
+                  {toReadableString(category)}
                 </Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>
-                <BreadcrumbPage>{title}</BreadcrumbPage>
-            </BreadcrumbItem>
-        </BreadcrumbList>
+          </>
+        )}
+        <BreadcrumbItem>
+          <BreadcrumbPage className="line-clamp-1 max-w-60">
+            {title}
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
     </Breadcrumb>
+  );
 }

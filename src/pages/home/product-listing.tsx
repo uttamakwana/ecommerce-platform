@@ -1,74 +1,76 @@
 import { CategoryPills } from "@/components";
-import { useProductFilter } from "@/contexts/product/useProductFilters";
-import { ProductCard, ProductCardSkeleton, SortBySelect } from "@/features/products/components";
+import { ErrorState } from "@/components/error-state";
+import {
+  ProductCardSkeleton,
+  SortBySelect,
+} from "@/features/products/components";
 import { ProductNotFound } from "@/features/products/components/product-no-found";
+import { VirtualizedProductGrid } from "@/features/products/components/virtualized-product-grid";
 import { useProducts } from "@/features/products/hooks";
-import type { IProductListingQueryArgs, IProductListingResponse } from "@/features/products/types";
-import { useObserver } from "@/hooks";
+import { useFilters } from "@/hooks";
+import { toReadableString } from "@/lib";
+
+const PAGE_SIZE = 24;
 
 export function ProductListing() {
-  const { searchParams } = useProductFilter();
-  const category = searchParams.get("category") ?? undefined;
-  const search = searchParams.get("search") ?? undefined;
-  const sortBy =
-    (searchParams.get("sortBy") as IProductListingQueryArgs["sortBy"]) ??
-    undefined;
-  const order =
-    (searchParams.get("order") as IProductListingQueryArgs["order"]) ??
-    undefined;
-  const skip = Number(searchParams.get("skip") ?? "1");
-  const limit = Number(searchParams.get("limit") ?? "20");
+  const { category, search, sortBy, order } = useFilters();
 
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProducts({
-    category,
-    search,
-    sortBy,
-    order,
-    skip,
-    limit,
-  });
-  const products = data?.pages?.flatMap((page) => page?.products) ?? [];
-  const hasProducts = products.length > 0;
-  const { lastItemRef } = useObserver<IProductListingResponse>({ isFetchingNextPage, hasNextPage, fetchNextPage: fetchNextPage });
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProducts({ category, search, sortBy, order, limit: PAGE_SIZE });
 
+  const products = data?.pages.flatMap((page) => page.products) ?? [];
+  const total = data?.pages[0]?.total ?? 0;
+
+  const heading = search
+    ? `Results for "${search}"`
+    : category
+      ? toReadableString(category)
+      : "All products";
 
   return (
-    <div className="flex flex-col gap-4 p-4 px-6 pt-0">
+    <div className="flex flex-col gap-5">
       <CategoryPills />
 
-      <div className="flex items-center justify-between gap-4 mt-4">
-        <h2 className="font-semibold">Products</h2>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold">{heading}</h2>
+          {!isLoading && !isError && (
+            <p className="text-sm text-muted-foreground">
+              {total.toLocaleString()} product{total === 1 ? "" : "s"}
+            </p>
+          )}
+        </div>
         <SortBySelect />
       </div>
 
-      {!isLoading && !hasProducts && <ProductNotFound title="No products" description="Kindly check the network connection or wait" />}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 gap-x-6">
-        {isLoading && Array.from({ length: 12 }).map((_, index) => (
-          <ProductCardSkeleton key={index} />
-        ))}
-
-        {products.map((product, index) => {
-          if (index === products.length - 1) {
-            return (
-              <div ref={lastItemRef} key={product.id}>
-                <ProductCard product={product} />
-              </div>
-            );
-          }
-
-          return (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          );
-        })}
-
-        {isFetchingNextPage && Array.from({ length: 20 }).map((_, index) => (
-          <ProductCardSkeleton key={index} />
-        ))}
-      </div>
+      {isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : isLoading ? (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <ProductCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <ProductNotFound
+          title="No products found"
+          description="Try a different search term or clear your filters to see everything."
+        />
+      ) : (
+        <VirtualizedProductGrid
+          products={products}
+          hasNextPage={Boolean(hasNextPage)}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+        />
+      )}
     </div>
   );
 }

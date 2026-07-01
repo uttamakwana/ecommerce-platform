@@ -1,6 +1,6 @@
-# E-Commerce Platform
+# AuroraShop — E-Commerce Platform
 
-A production-minded, single-page e-commerce application for browsing, searching, filtering, and buying products. Built with React + TypeScript and a real public product API, with a persistent cart, a full checkout experience, dark/light theming, infinite scrolling, and URL-driven filters.
+A production-minded, single-page e-commerce application for browsing, searching, comparing, and buying products. Built with **React 19 + TypeScript**, a real public product API, a **virtualized** product grid, a **multi-step checkout**, wishlist & compare, persistent cart, full reviews/gallery, dark/light theming, and URL-driven filters.
 
 > **Assignment:** SDE-2 Frontend Challenge #2 — _Build a production-ready e-commerce platform._
 
@@ -8,20 +8,34 @@ A production-minded, single-page e-commerce application for browsing, searching,
 
 ## Table of Contents
 
+- [Highlights](#highlights)
 - [Live Data Source](#live-data-source)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
 - [Architecture & Project Structure](#architecture--project-structure)
-- [Key Decisions](#key-decisions)
+- [Design System](#design-system)
+- [Engineering Decisions](#engineering-decisions)
+- [Testing](#testing)
 - [Getting Started](#getting-started)
 - [Available Scripts](#available-scripts)
 - [What I Would Do Differently With More Time](#what-i-would-do-differently-with-more-time)
 
 ---
 
+## Highlights
+
+- 🛒 **Complete purchase journey** — browse → product detail → cart → **3-step validated checkout** → order confirmation, with the cart cleared and the order persisted.
+- ⚡ **Windowed product grid** — only the rows near the viewport are mounted (via `@tanstack/react-virtual`), so scrolling through thousands of products keeps the DOM tiny. Infinite loading is driven by the virtualizer's own range.
+- ❤️ **Wishlist & 🔬 compare** — persisted, with a live compare tray and a side-by-side comparison table.
+- ⭐ **Rich product pages** — multi-image gallery + real customer reviews with a rating distribution.
+- 🧠 **Separated state** — server state (TanStack Query) vs. focused client stores (cart / wishlist / compare / orders), each memoized so unrelated updates don't cascade.
+- ✅ **Tested & typed** — 24 unit tests (Vitest + Testing Library), strict TypeScript, zero lint errors, error boundary, and accessible components.
+
+---
+
 ## Live Data Source
 
-The app uses the free, public **[DummyJSON](https://dummyjson.com)** API — no backend or API key required. It provides realistic product data (title, brand, price, discount, rating, reviews, stock, images) plus endpoints for listing, single-product lookup, categories, category filtering, search, sorting, and pagination.
+The app uses the free, public **[DummyJSON](https://dummyjson.com)** API — no backend or API key required. It provides realistic product data (title, brand, price, discount, rating, reviews, images, stock, shipping/warranty/return info) plus endpoints for listing, single-product lookup, categories, category filtering, search, sorting, and pagination.
 
 | Concern                     | Endpoint                       |
 | --------------------------- | ------------------------------ |
@@ -35,118 +49,148 @@ The app uses the free, public **[DummyJSON](https://dummyjson.com)** API — no 
 
 ## Tech Stack
 
-| Area          | Choice                           | Why                                                                                         |
-| ------------- | -------------------------------- | ------------------------------------------------------------------------------------------- |
-| Framework     | **React 19** + **TypeScript**    | Type safety and modern React (with the React Compiler for automatic memoization).           |
-| Build tool    | **Vite**                         | Fast dev server and optimized production builds.                                            |
-| Styling       | **Tailwind CSS v4**              | Utility-first, themeable, fast to iterate on.                                               |
-| UI primitives | **shadcn/ui** (Radix UI)         | Accessible, unstyled primitives (dialog, dropdown, select, alert, ...) I can fully control. |
-| Server state  | **TanStack Query v5**            | Caching, background refetching, and infinite queries out of the box.                        |
-| Routing       | **React Router**                 | Declarative routes with a shared layout.                                                    |
-| Client state  | **React Context + localStorage** | Lightweight cart state that persists across reloads and tabs.                               |
-| HTTP          | **Axios**                        | A single configured instance with a response interceptor for central error handling.        |
-| Notifications | **Sonner**                       | Toasts for cart feedback.                                                                   |
-| Animation     | **Motion** (Framer Motion)       | Animated order-confirmation check icon.                                                     |
-| Delight       | **canvas-confetti**              | Celebratory confetti on successful checkout.                                                |
-| Icons         | **lucide-react**                 | Consistent icon set.                                                                        |
+| Area          | Choice                             | Why                                                                          |
+| ------------- | ---------------------------------- | ---------------------------------------------------------------------------- |
+| Framework     | **React 19** + **TypeScript**      | Type safety and modern React (with the React Compiler for auto-memoization). |
+| Build tool    | **Vite**                           | Fast dev server and optimized, code-split production builds.                  |
+| Styling       | **Tailwind CSS v4**                | Utility-first, themeable via an OKLCH token system.                          |
+| UI primitives | **Radix UI / shadcn**              | Accessible primitives (dialog, dropdown, select, breadcrumb, …).            |
+| Server state  | **TanStack Query v5**              | Caching, background refetch, and **infinite queries** out of the box.        |
+| Virtualization| **@tanstack/react-virtual**        | Window virtualization for the product grid.                                  |
+| Forms         | **React Hook Form** + **Zod**      | Performant, fully-validated multi-step checkout (incl. Luhn card check).      |
+| Routing       | **React Router**                   | Declarative routes with a shared layout and lazy-loaded pages.               |
+| Client state  | **React Context + localStorage**   | Focused stores (cart/wishlist/compare/orders) with cross-tab sync.           |
+| HTTP          | **Axios**                          | A single configured instance with a response interceptor.                    |
+| Testing       | **Vitest** + **Testing Library**   | Unit tests for pricing, discounts, validation, and the cart store.           |
+| Notifications | **Sonner**                         | Toasts for cart/wishlist feedback.                                          |
+| Delight       | **canvas-confetti** + **Motion**   | Confetti + animated check on the order-confirmation screen.                  |
+| Icons         | **lucide-react**                   | Consistent icon set.                                                         |
 
 ---
 
 ## Features
 
-### Browsing
+### Browsing & discovery
 
-- **Product grid** with responsive columns (1 → 5 across mobile to ultra-wide).
-- **Infinite scroll** powered by `IntersectionObserver` — new pages load automatically as you reach the last card.
-- **Skeleton loaders** for the grid, category pills, and product details so layout never jumps.
-- **Product details page** with image, brand, category, price/discount, rating, review count, stock, and add/remove-from-cart.
+- **Virtualized product grid** — responsive 1→5 columns; only on-screen rows are in the DOM. Infinite loading triggers from the virtualizer's range (no extra observer).
+- **Global search** (⌘K / Ctrl-K) — debounced, reflected in the URL, and navigates back to the listing from anywhere.
+- **Category filtering** via an accessible, scrollable pill bar.
+- **Sorting** by title / price / rating / discount / stock with an asc/desc toggle and a clear-filters action.
+- **URL-driven state** — category, search, and sort live in the query string, so views are **shareable, bookmarkable, and survive refresh / back-forward** navigation.
 
-### Search, Filter & Sort
+### Product detail
 
-- **Debounced search** (500 ms) that updates results as you type without hammering the API.
-- **Category filtering** via both a scrollable pill bar and a dropdown.
-- **Sorting** by a curated set of fields (title, price, rating, discount, stock) with an **ascending/descending** toggle and a **clear-filters** action.
-- **URL-driven state** — the active category, search term, and sort options live in the query string, so filters are **shareable, bookmarkable, and survive refresh / back-forward navigation**.
+- **Image gallery** across the full `images[]` array with thumbnail navigation.
+- **Reviews** — real customer reviews with an aggregate score and a 5→1 star distribution.
+- Full data surface: brand, tags, availability, shipping, warranty, return policy, and minimum order quantity.
+- Add to cart with a **stock-aware** quantity stepper, plus wishlist & compare toggles.
 
-### Cart & Checkout
+### Cart, wishlist & compare
 
-- **Add / remove** items with instant toast feedback.
-- **Quantity controls** with **stock-aware limits** (you can't exceed available stock, and can't go below 1).
-- **Persistent cart** stored in `localStorage`, including **cross-tab synchronization** (add an item in one tab, it appears in another).
-- **Cart badge** in the header showing the number of items.
-- **Order summary** with a full breakdown — subtotal, discount, flat shipping, and tax — and a computed grand total.
-- **Checkout experience** — "Proceed to Checkout" launches a confetti celebration and an **order-confirmation dialog** showing a generated Order ID and estimated delivery. _(It's a demo checkout — no payment is taken and no real order is placed.)_
+- **Cart** — merges quantities (no duplicate lines), enforces stock caps, removes a line at qty 0, and persists to `localStorage` with **cross-tab sync**.
+- **Order summary** with a centralized pricing model — subtotal, discount, tax, and **free shipping over $100** (with a "add $X more" nudge).
+- **Wishlist** — persisted, with its own page and header badge.
+- **Compare** — a floating tray (up to 4 products) and a side-by-side attribute table.
 
-### UX / UI
+### Checkout
 
-- **Dark / Light / System theme** toggle, persisted across sessions.
-- **Empty states** for an empty cart and no-results searches.
-- **Custom 404 page** with "Go Home" / "Go Back" actions.
-- Fully **responsive** layout.
+- **3-step flow** — Shipping → Payment → Review — with a progress indicator.
+- **Full validation** via Zod: email, phone, postal code, and a **Luhn-checked** card number with expiry/CVV rules.
+- On "Place order": simulates a request, **persists the order**, **clears the cart**, and routes to a confirmation screen with an order ID, estimated delivery window, itemized totals, and confetti.
 
-### Engineering
+### UX / quality
 
-- **Feature-based folder structure** that scales.
-- **Central Axios instance** with a response interceptor that unwraps `data` and normalizes errors in one place.
-- **Typed API layer** and query keys for predictable caching.
-- **React Compiler** enabled for automatic memoization.
+- **Dark / Light / System** theme, persisted.
+- **Error boundary** + explicit **error states** with retry for failed fetches (not just empty states).
+- **Empty states** for cart, wishlist, compare, and no-results.
+- **Accessibility** — semantic roles, `aria-*` labels, keyboard-operable controls, labelled form fields, and screen-reader-friendly rating/quantity widgets.
+- Custom **404** and route-level code splitting.
 
 ---
 
 ## Architecture & Project Structure
 
-The project follows a **feature-first** organization: cross-cutting building blocks live at the top level, while product-specific logic is colocated under `features/products`.
+The project is **feature-first**: cross-cutting building blocks live at the top level, product-specific logic under `features/products`, and page-specific composition under `pages`.
 
 ```
 src/
-├── api/                     # Axios instance, base config, HTTP helpers, query client
+├── api/                      # Axios instance, config, typed HTTP helpers, query client
 ├── components/
-│   ├── search/              # Search bar, category pills, category dropdown, cart button
-│   └── ui/                  # shadcn/ui primitives (button, card, select, dialog, alert, ...)
+│   ├── search/               # Search input, category pills, cart & wishlist buttons
+│   ├── ui/                   # Radix/shadcn primitives
+│   ├── error-boundary.tsx    # App-level crash recovery
+│   └── error-state.tsx       # Reusable retryable error UI
 ├── contexts/
-│   ├── product/             # Cart + filter context (client state) and its hooks
-│   └── theme-provider.tsx   # Dark/light/system theme
+│   ├── cart/                 # Cart store (context + provider) — merge/stock logic
+│   ├── wishlist/             # Wishlist store
+│   ├── compare/              # Compare store (max 4)
+│   ├── orders/               # Placed-orders store
+│   ├── store-provider.tsx    # Composes the client stores
+│   └── theme-provider.tsx    # Dark/light/system theme
 ├── features/
-│   └── products/            # Product domain: API, hooks, components, types, utils
-│       ├── api/             # Endpoints + query keys
-│       ├── components/      # ProductCard, skeletons, sort select, breadcrumb, ...
-│       ├── hooks/           # useProducts (infinite), useGetProduct, useCategories
-│       ├── types.ts         # Product domain types
-│       └── utils.ts         # e.g. discounted-price calculation
-├── hooks/                   # Reusable hooks: useDebounce, useObserver, useStorage
-├── layout/                  # Root layout + header
+│   └── products/             # Product domain
+│       ├── api/              # Endpoints + query keys
+│       ├── components/       # Card, virtualized grid, gallery, reviews, compare bar…
+│       ├── hooks/            # useProducts (infinite), useGetProduct, useCategories
+│       ├── pricing.ts        # Centralized cart pricing rules (+ tests)
+│       ├── types.ts          # Domain types
+│       └── utils.ts          # Discounted-price helper (+ tests)
+├── hooks/                    # useDebounce(+Callback), useObserver, useStorage, useFilters
+├── layout/                   # Root layout, header, scroll-to-top
 ├── pages/
-│   ├── cart/                # Cart, summary, checkout modal, confetti, confirmation icon
-│   ├── home/                # Product listing
-│   ├── product/             # Product details
-│   └── not-found/           # 404
-└── routes/                  # Router configuration
+│   ├── home/                 # Hero + virtualized listing
+│   ├── product/              # Product detail
+│   ├── cart/                 # Cart + reusable order summary
+│   ├── checkout/             # Multi-step checkout (schema, forms, review)
+│   ├── order/                # Order confirmation
+│   ├── wishlist/ · compare/  # Wishlist & compare pages
+│   └── not-found/            # 404
+├── routes/                   # Router + lazy routes + Suspense wrapper
+└── test/                     # Vitest setup
 ```
 
-**Data flow at a glance:**
-
-- **Server state** (products, categories, single product) → **TanStack Query** with caching, `staleTime`, and infinite pagination.
-- **Client state** (cart, filters) → **React Context**. Cart is mirrored to `localStorage`; filters are mirrored to the **URL query string**.
+**Data flow:** server state (products, categories, single product) → **TanStack Query**; client state (cart, wishlist, compare, orders) → **focused React contexts** mirrored to `localStorage`; browse filters → **URL query string**.
 
 ---
 
-## Key Decisions
+## Design System
 
-- **Server state vs. client state are separated.** Anything that comes from the API is owned by TanStack Query (so I get caching, dedupe, and background refetch for free). Anything the user owns — the cart and active filters — lives in React Context. This keeps each concern simple and avoids re-inventing a cache.
+A custom **"Aurora"** theme replaces the default neutral palette:
 
-- **The URL is the source of truth for filters.** Category, search, and sort are stored in `searchParams` rather than component state. This makes result views shareable and bookmarkable, and makes the browser's back/forward buttons "just work."
+- **OKLCH tokens** for perceptually-uniform, accessible light/dark pairs.
+- An energetic **indigo→violet brand gradient** with an amber accent (deals/ratings) and a green success token (confirmations).
+- Consistent radius / spacing / typography (Geist) and signature gradient surfaces for the hero and brand elements.
 
-- **Infinite scroll over pagination.** For product discovery, an `IntersectionObserver`-based infinite scroll feels more natural than page numbers and pairs cleanly with `useInfiniteQuery`.
+Everything is driven by CSS variables in `src/index.css`, so the whole look can be re-themed from one place.
 
-- **Debounced search.** Search input is debounced so we only query after the user pauses typing, reducing unnecessary network calls.
+---
 
-- **A single Axios instance with an interceptor.** Response data is unwrapped once (`res.data`) and errors are normalized in one place, so call sites stay clean and don't repeat `.data` everywhere.
+## Engineering Decisions
 
-- **shadcn/ui + Tailwind v4.** Rather than a heavyweight component library, I used accessible Radix-based primitives I can fully restyle, which keeps the bundle and the design under my control.
+- **Server vs. client state are separated.** API data is owned by TanStack Query (caching, dedupe, background refetch); user-owned data (cart/wishlist/compare) lives in React Context. No hand-rolled cache.
+- **Stores are split, not one mega-context.** Cart, wishlist, compare, and orders are independent, memoized providers, so a wishlist change never re-renders cart consumers — a concrete fix for the classic context re-render pitfall.
+- **Pricing lives in one place.** `features/products/pricing.ts` owns shipping/tax/discount rules and is unit-tested, so the cart, summary, and checkout can never disagree.
+- **Virtualization over naive rendering.** The grid windows rows and folds infinite loading into the virtualizer, keeping the DOM flat regardless of how far you scroll.
+- **The URL is the source of truth for filters** — shareable, bookmarkable, back/forward-friendly.
+- **A checkout that behaves like a real one** — validated multi-step form, simulated request, persisted order, cleared cart, and a proper confirmation.
+- **Resilience by default** — an error boundary plus retryable error states, rather than silently showing "no results".
+- **Single Axios instance + interceptor** unwraps `data` and normalizes errors once.
 
-- **localStorage-backed cart with cross-tab sync.** A custom `useStorage` hook persists the cart and listens to the `storage` event so multiple tabs stay consistent.
+---
 
-- **A checkout that feels finished.** Even without a backend, the flow ends in a clear confirmation (order ID, estimated delivery) plus a small moment of delight (confetti), so "purchasing" is a complete experience rather than a dead-end button.
+## Testing
+
+Unit tests cover the highest-risk logic:
+
+- `pricing.test.ts` — subtotal, discounts, free-shipping threshold, tax, totals.
+- `utils.test.ts` — discounted-price math.
+- `schema.test.ts` — checkout validation (email, Luhn card, expiry, CVV).
+- `cart-provider.test.tsx` — quantity merging, stock caps, removal, clearing, persistence.
+
+```bash
+npm test          # run once
+npm run test:watch
+```
 
 ---
 
@@ -159,14 +203,9 @@ src/
 ### Installation & Run
 
 ```bash
-# 1. Install dependencies
-npm install
-
-# 2. Start the dev server
-npm start
+npm install       # install dependencies
+npm start         # start the Vite dev server (http://localhost:5173)
 ```
-
-The app will be available at the URL Vite prints (default **http://localhost:5173**).
 
 ### Production build
 
@@ -179,22 +218,23 @@ npm run preview   # serve the production build locally
 
 ## Available Scripts
 
-| Script            | Description                                         |
-| ----------------- | --------------------------------------------------- |
-| `npm start`       | Start the Vite dev server with HMR.                 |
-| `npm run dev`     | Alias for `start`.                                  |
-| `npm run build`   | Type-check (`tsc`) and build the production bundle. |
-| `npm run preview` | Preview the production build locally.               |
-| `npm run lint`    | Run ESLint across the project.                      |
+| Script               | Description                                          |
+| -------------------- | --------------------------------------------------- |
+| `npm start` / `dev`  | Start the Vite dev server with HMR.                 |
+| `npm run build`      | Type-check (`tsc`) and build the production bundle. |
+| `npm run preview`    | Preview the production build locally.               |
+| `npm run lint`       | Run ESLint across the project.                      |
+| `npm test`           | Run the unit test suite once (Vitest).              |
+| `npm run test:watch` | Run tests in watch mode.                             |
 
 ---
 
 ## What I Would Do Differently With More Time
 
-- **Richer product page.** Use the full `images[]` gallery instead of only the thumbnail, and render the actual customer **reviews** (the data is already available).
-- **Wishlist / favorites.**
-- **Automated tests.** Unit tests for the cart/price logic (Vitest) and component/integration tests (React Testing Library).
-- **Resilience.** Add error boundaries and explicit retry UI for failed requests, rather than relying on empty states.
--- **Admin Side.** Add the product add, update and remove flow for better product control.
-
----
+- **More tests** — component/integration tests for checkout and the virtualized grid, plus a Playwright happy-path E2E (browse → checkout → confirmation).
+- **Real auth & orders** — DummyJSON `/auth` login, gated checkout, and an order history page.
+- **Optimistic cart & wishlist** with rollback on failure.
+- **Analytics & monitoring** — wire the error boundary to Sentry and add basic product/checkout events.
+- **i18n & currency** formatting via `Intl`.
+- **Admin surface** — product create/update/remove against a mock API.
+```
