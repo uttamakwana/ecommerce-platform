@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { useState } from "react";
 import { CheckoutModal } from "./checkout-modal";
 import { ConfettiFireworks } from "./confetti-fireworks";
-import { useProductFilter } from "@/contexts/product/useProductFilters";
 
 type TCartSummaryProps = {
   subTotal: number;
@@ -20,7 +19,6 @@ export function CartSummary({
 }: TCartSummaryProps) {
   const total = subTotal - discount + shipping + tax;
   const [open, setOpen] = useState(false);
-  const { emptyCart } = useProductFilter();
 
   return (
     <Card className="sticky flex-1 max-w-full sm:max-w-60 mx-4 sm:mx-0 self-stretch sm:self-start">
@@ -64,7 +62,6 @@ export function CartSummary({
         <ConfettiFireworks
           onClick={() => {
             setOpen(true);
-            emptyCart();
           }}
         />
 
