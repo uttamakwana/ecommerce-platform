@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { Scale, X } from "lucide-react";
 import { Button } from "@/components/ui";
+import { ProductImage } from "./product-image";
 import { useCompare } from "@/contexts";
 import { MAX_COMPARE } from "@/contexts/compare/compare-context";
 
@@ -25,17 +26,18 @@ export function CompareBar() {
 
         <div className="flex flex-1 items-center gap-2 overflow-x-auto scrollbar-none">
           {items.map((item) => (
-            <div key={item.id} className="relative shrink-0">
-              <img
+            <div key={item.id} className="relative shrink-0 overflow-hidden rounded-tr-sm">
+              <ProductImage
                 src={item.thumbnail}
                 alt={item.title}
-                className="size-11 rounded-lg border object-cover"
+                wrapperClassName="size-11 rounded-lg border"
+                className="object-cover"
               />
               <button
                 type="button"
                 aria-label={`Remove ${item.title} from compare`}
                 onClick={() => remove(item.id)}
-                className="absolute -right-1.5 -top-1.5 grid size-4.5 place-items-center rounded-full bg-foreground text-background"
+                className="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-red-400 text-white cursor-pointer"
               >
                 <X className="size-3" />
               </button>

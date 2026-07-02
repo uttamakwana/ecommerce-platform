@@ -24,8 +24,9 @@ A production-minded, single-page e-commerce application for browsing, searching,
 
 ## Highlights
 
-- 🛒 **Complete purchase journey** — browse → product detail → cart → **3-step validated checkout** → order confirmation, with the cart cleared and the order persisted.
+- 🛒 **Complete purchase journey** — browse → product detail → cart → **3-step validated checkout** → order confirmation, with the cart cleared and the order persisted. **Buy Now** shortcuts straight to checkout from any card or the detail page.
 - ⚡ **Windowed product grid** — only the rows near the viewport are mounted (via `@tanstack/react-virtual`), so scrolling through thousands of products keeps the DOM tiny. Infinite loading is driven by the virtualizer's own range.
+- 🖼️ **Galleries everywhere + optimized images** — product cards double as a mini gallery (hover the dots to preview `images[]`), the detail page has a full gallery, and every image lazy-loads, async-decodes, fades in over a shimmer, and degrades gracefully on error.
 - ❤️ **Wishlist & 🔬 compare** — persisted, with a live compare tray and a side-by-side comparison table.
 - ⭐ **Rich product pages** — multi-image gallery + real customer reviews with a rating distribution.
 - 🧠 **Separated state** — server state (TanStack Query) vs. focused client stores (cart / wishlist / compare / orders), each memoized so unrelated updates don't cascade.
@@ -73,6 +74,7 @@ The app uses the free, public **[DummyJSON](https://dummyjson.com)** API — no 
 ### Browsing & discovery
 
 - **Virtualized product grid** — responsive 1→5 columns; only on-screen rows are in the DOM. Infinite loading triggers from the virtualizer's range (no extra observer).
+- **Product cards as mini galleries** — cards render `images[]` with dot indicators; hovering or focusing a dot previews each image, plus **Buy Now** and a quick add-to-cart action.
 - **Global search** (⌘K / Ctrl-K) — debounced, reflected in the URL, and navigates back to the listing from anywhere.
 - **Category filtering** via an accessible, scrollable pill bar.
 - **Sorting** by title / price / rating / discount / stock with an asc/desc toggle and a clear-filters action.
@@ -83,7 +85,7 @@ The app uses the free, public **[DummyJSON](https://dummyjson.com)** API — no 
 - **Image gallery** across the full `images[]` array with thumbnail navigation.
 - **Reviews** — real customer reviews with an aggregate score and a 5→1 star distribution.
 - Full data surface: brand, tags, availability, shipping, warranty, return policy, and minimum order quantity.
-- Add to cart with a **stock-aware** quantity stepper, plus wishlist & compare toggles.
+- **Buy Now** (straight to checkout) plus add to cart with a **stock-aware** quantity stepper, and wishlist & compare toggles.
 
 ### Cart, wishlist & compare
 
@@ -101,6 +103,7 @@ The app uses the free, public **[DummyJSON](https://dummyjson.com)** API — no 
 ### UX / quality
 
 - **Dark / Light / System** theme, persisted.
+- **Optimized images** — a shared `ProductImage` component lazy-loads (and `fetchPriority`-hints the hero), async-decodes, reserves layout space to avoid CLS, fades in over a shimmer placeholder, and falls back to an icon if a URL fails.
 - **Error boundary** + explicit **error states** with retry for failed fetches (not just empty states).
 - **Empty states** for cart, wishlist, compare, and no-results.
 - **Accessibility** — semantic roles, `aria-*` labels, keyboard-operable controls, labelled form fields, and screen-reader-friendly rating/quantity widgets.
@@ -130,7 +133,7 @@ src/
 ├── features/
 │   └── products/             # Product domain
 │       ├── api/              # Endpoints + query keys
-│       ├── components/       # Card, virtualized grid, gallery, reviews, compare bar…
+│       ├── components/       # Card, virtualized grid, gallery, optimized image, reviews, compare bar…
 │       ├── hooks/            # useProducts (infinite), useGetProduct, useCategories
 │       ├── pricing.ts        # Centralized cart pricing rules (+ tests)
 │       ├── types.ts          # Domain types
@@ -174,6 +177,7 @@ Everything is driven by CSS variables in `src/index.css`, so the whole look can 
 - **The URL is the source of truth for filters** — shareable, bookmarkable, back/forward-friendly.
 - **A checkout that behaves like a real one** — validated multi-step form, simulated request, persisted order, cleared cart, and a proper confirmation.
 - **Resilience by default** — an error boundary plus retryable error states, rather than silently showing "no results".
+- **Images are optimized at the component level.** A single `ProductImage` centralizes lazy-loading, async decoding, priority hints, CLS-free sizing, fade-in, and error fallback — used consistently across cards, galleries, cart, compare, and checkout.
 - **Single Axios instance + interceptor** unwraps `data` and normalizes errors once.
 
 ---
@@ -231,6 +235,7 @@ npm run preview   # serve the production build locally
 
 ## What I Would Do Differently With More Time
 
+- **Responsive images / CDN** — DummyJSON serves fixed-size image URLs, so there's no `srcset`/`sizes` or WebP/AVIF to generate. Behind an image CDN (Cloudinary/imgix), `ProductImage` would emit responsive sources and modern formats; the component is already structured to make that a one-place change.
 - **More tests** — component/integration tests for checkout and the virtualized grid, plus a Playwright happy-path E2E (browse → checkout → confirmation).
 - **Real auth & orders** — DummyJSON `/auth` login, gated checkout, and an order history page.
 - **Optimistic cart & wishlist** with rollback on failure.

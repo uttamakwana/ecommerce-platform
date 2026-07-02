@@ -2,6 +2,7 @@ import { ArrowLeft, Loader2, Lock, MapPin, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui";
 import type { TCartItem } from "@/features/products/types";
 import { getDiscountedPrice } from "@/features/products/utils";
+import { ProductImage } from "@/features/products/components";
 import type { ShippingValues } from "./schema";
 
 interface ReviewStepProps {
@@ -60,10 +61,11 @@ export function ReviewStep({
         <ul className="divide-y">
           {items.map((item) => (
             <li key={item.id} className="flex items-center gap-3 p-4">
-              <img
+              <ProductImage
                 src={item.thumbnail}
                 alt={item.title}
-                className="size-14 rounded-lg border object-cover"
+                wrapperClassName="size-14 shrink-0 rounded-lg border"
+                className="object-cover"
               />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-1 font-medium">{item.title}</p>

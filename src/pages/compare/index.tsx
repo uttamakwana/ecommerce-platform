@@ -3,6 +3,7 @@ import { ShoppingCart, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui";
 import { ProductNotFound } from "@/features/products/components/product-no-found";
 import { StarRating } from "@/features/products/components/star-rating";
+import { ProductImage } from "@/features/products/components";
 import { useCart, useCompare } from "@/contexts";
 import { getDiscountedPrice } from "@/features/products/utils";
 import type { IProduct } from "@/features/products/types";
@@ -77,7 +78,7 @@ export default function Compare() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border">
-        <table className="w-full min-w-[640px] border-collapse text-sm">
+        <table className="w-full min-w-160 border-collapse text-sm">
           <thead>
             <tr>
               <th className="w-32 border-b bg-muted/40 p-4 text-left align-bottom" />
@@ -96,10 +97,11 @@ export default function Compare() {
                       <X className="size-4" />
                     </button>
                     <Link to={`/products/${product.id}`}>
-                      <img
+                      <ProductImage
                         src={product.thumbnail}
                         alt={product.title}
-                        className="size-24 rounded-xl border object-cover"
+                        wrapperClassName="size-24 rounded-xl border"
+                        className="object-cover"
                       />
                     </Link>
                     <Link

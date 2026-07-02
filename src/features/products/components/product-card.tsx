@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Heart, Scale, ShoppingCart, Star, Zap } from "lucide-react";
 import { Badge, Button } from "@/components/ui";
@@ -6,6 +6,7 @@ import { cn } from "@/lib";
 import { useCart, useCompare, useWishlist } from "@/contexts";
 import type { IProduct } from "../types";
 import { getDiscountedPrice } from "../utils";
+import { ProductImage } from "./product-image";
 import { CartItemQuantity } from "@/pages/cart/cart-item-quantity";
 
 interface IProductCardProps {
@@ -26,6 +27,10 @@ function ProductCardComponent({ product }: IProductCardProps) {
   const isWishlisted = wishlist.has(product.id);
   const isComparing = compare.has(product.id);
 
+  // Gallery preview: cycle through images[] on hover/focus of the dots.
+  const gallery = product.images?.length ? product.images : [product.thumbnail];
+  const [activeImage, setActiveImage] = useState(0);
+
   // Add to the cart (if not already there) and jump straight to checkout.
   const handleBuyNow = () => {
     if (!inCart) addItem(product);
@@ -34,18 +39,39 @@ function ProductCardComponent({ product }: IProductCardProps) {
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
-      <div className="relative overflow-hidden bg-muted/40">
+      <div
+        className="relative bg-muted/40"
+        onMouseLeave={() => setActiveImage(0)}
+      >
         <Link
           to={`/products/${product.id}`}
           aria-label={`View ${product.title}`}
         >
-          <img
-            src={product.thumbnail}
+          <ProductImage
+            src={gallery[activeImage]}
             alt={product.title}
-            loading="lazy"
-            className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            wrapperClassName="aspect-square w-full"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
+
+        {gallery.length > 1 && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
+            {gallery.map((image, index) => (
+              <button
+                key={image}
+                type="button"
+                aria-label={`Preview image ${index + 1} of ${gallery.length}`}
+                onMouseEnter={() => setActiveImage(index)}
+                onFocus={() => setActiveImage(index)}
+                className={cn(
+                  "pointer-events-auto h-1.5 rounded-full bg-foreground/25 backdrop-blur transition-all",
+                  index === activeImage ? "w-4 bg-primary" : "w-1.5",
+                )}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between">
           <div className="flex flex-col gap-1.5">

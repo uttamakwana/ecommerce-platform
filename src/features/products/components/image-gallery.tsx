@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib";
+import { ProductImage } from "./product-image";
 
 interface ImageGalleryProps {
   images: string[];
@@ -14,14 +15,13 @@ export function ImageGallery({ images, fallback, alt }: ImageGalleryProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative aspect-square overflow-hidden rounded-2xl border bg-muted/30">
-        <img
-          key={gallery[active]}
-          src={gallery[active]}
-          alt={`${alt} — image ${active + 1} of ${gallery.length}`}
-          className="size-full object-contain p-6"
-        />
-      </div>
+      <ProductImage
+        src={gallery[active]}
+        alt={`${alt} — image ${active + 1} of ${gallery.length}`}
+        eager
+        wrapperClassName="aspect-square rounded-2xl border"
+        className="object-contain p-6"
+      />
 
       {gallery.length > 1 && (
         <div className="scrollbar-none flex gap-3 overflow-x-auto">
@@ -33,16 +33,17 @@ export function ImageGallery({ images, fallback, alt }: ImageGalleryProps) {
               aria-current={index === active}
               onClick={() => setActive(index)}
               className={cn(
-                "size-20 shrink-0 overflow-hidden rounded-xl border bg-muted/30 transition-all",
+                "size-20 shrink-0 overflow-hidden rounded-xl border transition-all",
                 index === active
                   ? "border-primary ring-2 ring-primary/30"
                   : "opacity-70 hover:opacity-100",
               )}
             >
-              <img
+              <ProductImage
                 src={image}
                 alt=""
-                className="size-full object-contain p-1.5"
+                wrapperClassName="size-full"
+                className="object-contain p-1.5"
               />
             </button>
           ))}

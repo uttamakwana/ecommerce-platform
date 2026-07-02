@@ -3,6 +3,7 @@ import { Trash2 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import type { TCartItem } from "@/features/products/types";
 import { getDiscountedPrice } from "@/features/products/utils";
+import { ProductImage } from "@/features/products/components";
 import { CartItemQuantity } from "./cart-item-quantity";
 
 type TCartItemProps = {
@@ -24,10 +25,11 @@ export function CartItem({
   return (
     <Card className="flex flex-row gap-4 p-3 sm:p-4">
       <Link to={`/products/${item.id}`} className="shrink-0">
-        <img
+        <ProductImage
           src={item.thumbnail}
           alt={item.title}
-          className="size-24 rounded-xl border object-cover sm:size-28"
+          wrapperClassName="size-24 rounded-xl border sm:size-28"
+          className="object-cover"
         />
       </Link>
 

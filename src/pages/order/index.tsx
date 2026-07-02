@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import { Package, Truck, Home } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
 import { ProductNotFound } from "@/features/products/components/product-no-found";
+import { ProductImage } from "@/features/products/components";
 import { useOrders } from "@/contexts";
 import { CheckSVG } from "@/pages/cart/check-svg";
 
@@ -104,10 +105,11 @@ export default function OrderConfirmation() {
           <ul className="divide-y">
             {order.items.map((item) => (
               <li key={item.id} className="flex items-center gap-3 py-3">
-                <img
+                <ProductImage
                   src={item.thumbnail}
                   alt={item.title}
-                  className="size-12 rounded-lg border object-cover"
+                  wrapperClassName="size-12 shrink-0 rounded-lg border"
+                  className="object-cover"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-1 font-medium">{item.title}</p>

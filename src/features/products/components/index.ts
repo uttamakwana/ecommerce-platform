@@ -5,6 +5,7 @@ export * from "./product-details-skeleton";
 export * from "./product-breadcrumb";
 export * from "./virtualized-product-grid";
 export * from "./image-gallery";
+export * from "./product-image";
 export * from "./product-reviews";
 export * from "./star-rating";
 export * from "./compare-bar";
